@@ -30,10 +30,12 @@ a:hover { text-decoration: none; }
   transition: opacity 500ms cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
+.text { word-wrap: anywhere; }
+
 .options { margin-top: 10px; }
 
 .options > div {
-  text-decoration: underline;
+  /* text-decoration: underline; */
   cursor: pointer;
   margin-top: 5px;
   text-decoration: none;

@@ -22,6 +22,7 @@ class OTTA {
     ]
 
     this.str = this.updateStr(0)
+    this.setupConvo(opts.conversation)
 
     if (window.crypto || window.msCrypto) {
       this.hashIt(this.canvasString, (hash) => {
@@ -48,9 +49,6 @@ Line Number: ${linenumber}`)
         return true
       }
     }
-
-    this.setupConvo(opts.conversation)
-    // this.setupSVGLines()
   }
 
   // ---- setup ----------------------------------------------------------------
@@ -631,34 +629,34 @@ Line Number: ${linenumber}`)
         }
       },
       'print-complete': {
-        content: `Now, once we add the canvas fingerprint string from before and compress it all into a single "hashed" value, your unique fingerprint becomes ${this.idb}.`,
+        content: `Once we add the canvas fingerprint string from before and compress it all into a single "hashed" value, we arrive at your unique fingerprint ${this.username}...`,
         options: {
-          'go on...': () => {
-            this.str = this.updateStr(8)
-            this.goTo('test')
+          'show me...': () => {
+            this.str = this.updateStr(9)
+            this.goTo('final-fingerprint')
           }
         }
       },
-      'test': {
-        content: '',
+      'final-fingerprint': {
+        content: this.id,
         options: {
-          'go on...': () => { this.goTo('test') }
+          '...': () => { this.goTo('diff-task') }
         }
       },
-      'test': {
-        content: '',
+      'diff-task': {
+        content: 'This sort of fingerprinting takes a lot of effort and creativity. Using data in unconventional ways isn\'t inherently unethical. Just imagine what these clever programmers could have created instead had their skills been assigned to a different task?',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'I can only imagine...': () => { this.goTo('today-we-block') }
         }
       },
-      'test': {
-        content: '',
+      'today-we-block': {
+        content: 'Thankfully today privacy conscious browsers like Brave and Firefox are attempting to block fingerprinting. But so long as surveillance capitalism remains legal and profitable, the trackers will continue to be incentivized to create even more connivingly crafty ways of watching and exploiting you online.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'it\'s a cat and mouse game': () => { this.goTo('cat-and-mouse') }
         }
       },
-      'test': {
-        content: '',
+      'cat-and-mouse': {
+        content: 'It is, and speaking of your mouse, techniques like <a href="https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector#session-recording" target="_blank">session recording</a> and <a href="key-logging" target="_blank">key logging</a> have now also become part of the online tracking toolkit.',
         options: {
           'go on...': () => { this.goTo('test') }
         }
