@@ -49,6 +49,13 @@ Line Number: ${linenumber}`)
         return true
       }
     }
+
+    window.addEventListener('resize', (e) => {
+      this.positionConvo()
+      this.canvasEle.width = window.innerWidth
+      this.canvasEle.height = window.innerHeight
+      this.drawCanvasBG(this.canvasEle)
+    })
   }
 
   // ---- setup ----------------------------------------------------------------
@@ -190,6 +197,8 @@ Line Number: ${linenumber}`)
       return g
     }
 
+    ctx.clearRect(0, 0, w, h)
+
     let x = w * 0.5
     let y = h * 0.5
     const r1 = (w > h) ? h / 8 : w / 8
@@ -311,12 +320,16 @@ Line Number: ${linenumber}`)
 
   logKeyStrokes (e) {
     if (!this.logging) return
-    this.logs.keystrokes.push(e.target.value)
+    this.logs.keystrokes.push({
+      time: Date.now(), keys: e.target.value
+    })
   }
 
   logMouseMove (e) {
     if (!this.logging) return
-    this.logs.mousemoves.push({ x: e.clientX, y: e.clientY })
+    this.logs.mousemoves.push({
+      time: Date.now(), x: e.clientX, y: e.clientY
+    })
   }
 
   // --------------------------------------------------------------------------
