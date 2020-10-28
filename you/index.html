@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>How They Watch You</title>
+    <link rel="stylesheet" href="../css/better-serif.css">
+    <link rel="stylesheet" href="../css/styles.css">
+  </head>
+  <body>
+
+    <section id="convo">
+      <div class="text"></div>
+      <div class="options"></div>
+    </section>
+
+    <script src="../js/Averigua.js"></script>
+    <script src="../js/online-tracking-transparency-agent.js"></script>
+    <script>
+        const otta = new OTTA({
+          background: document.body,
+          conversation: '#convo'
+          // mobileDebug: true
+        })
+    </script>
+  </body>
+</html>

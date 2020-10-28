@@ -129,7 +129,7 @@ class Averigua {
 
   static language () {
     const arr = navigator.language.split('-')
-    const lan = { langauge: this.languageCodes()[arr[0]] }
+    const lan = { language: this.languageCodes()[arr[0]] }
     if (arr.length > 1) lan.country = this.countryCodes()[arr[1]]
     return lan
   }

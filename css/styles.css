@@ -1,0 +1,59 @@
+@keyframes pulseCanvas {
+  0% { opacity: 0.75; }
+  50% { opacity: 1; }
+  100% { opacity: 0.75; }
+}
+
+body {
+  margin: 0; padding:0;
+  background-color: #292929;
+  font-family: "better-serif", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: #fff }
+a:hover { text-decoration: none; }
+
+#convo {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  max-width: 30vw;
+  padding: 24px;
+  color: #fff;
+  font-size: 1.4vw;
+  line-height: 1.8vw;
+  text-shadow: 0px 0px 30px #000;
+  opacity: 1;
+  transition: opacity 500ms cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.options { margin-top: 10px; }
+
+.options > div {
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 5px;
+  text-decoration: none;
+}
+
+.options > div:before { content: '▶ '; opacity: 0  }
+
+.options > div:hover:before { opacity: 1 }
+
+.options > input, .options > button {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 16px;
+  margin-right: 10px;
+  transition: background-color 1s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.options > button:hover {
+  background-color: rgb(136, 65, 93);
+  cursor: pointer;
+}
