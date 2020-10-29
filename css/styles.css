@@ -10,10 +10,15 @@ body {
   font-family: "better-serif", "HelveticaNeue-Light", "Helvetica Neue Light", "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  cursor: url('../images/cursor.png'), auto;
 }
 
 a { color: #fff }
 a:hover { text-decoration: none; }
+
+svg {
+  position: fixed;
+}
 
 #convo {
   position: fixed;
@@ -43,7 +48,7 @@ a:hover { text-decoration: none; }
 
 .options > div:before { content: '▶ '; opacity: 0  }
 
-.options > div:hover:before { opacity: 1 }
+.options > div:hover:before { opacity: 1; }
 
 .options > input, .options > button {
   background-color: rgba(0, 0, 0, 0.5);

@@ -3,12 +3,11 @@ class OTTA {
   constructor (opts) {
     opts = opts || {}
 
-    this.svgBox = this.createSVG(opts.background)
     const canvas = this.createCanvases()
     this.canvasEle = canvas.bg
     this.canvasString = canvas.fp.toDataURL()
 
-    this.logs = { keystrokes: [], mousemoves: [] }
+    this.logs = []
     this.data = [
       this.toStr(Averigua.language()),
       `timezone: ${Averigua.timeZone()}`,
@@ -23,6 +22,10 @@ class OTTA {
 
     this.str = this.updateStr(0)
     this.setupConvo(opts.conversation)
+
+    this.svgBox = this.createSVG(opts.background)
+    this.setupSVGLines()
+    this.positionSVG()
 
     if (window.crypto || window.msCrypto) {
       this.hashIt(this.canvasString, (hash) => {
@@ -52,6 +55,7 @@ Line Number: ${linenumber}`)
 
     window.addEventListener('resize', (e) => {
       this.positionConvo()
+      this.positionSVG()
       this.canvasEle.width = window.innerWidth
       this.canvasEle.height = window.innerHeight
       this.drawCanvasBG(this.canvasEle)
@@ -156,15 +160,23 @@ Line Number: ${linenumber}`)
     svg.style.fontWeight = 'bold'
     svg.style.width = '50vw'
     svg.style.display = 'block'
-    const h = (window.innerWidth / 2 / 660) * 656
-    const H = window.innerHeight
-    svg.style.margin = `${H / 2 - h / 2}px auto`
+    svg.style.opacity = '0'
+    svg.style.transition = 'opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1)'
 
     this.parent = (parentSlector && typeof parentSlector === 'string')
       ? document.querySelector(parentSlector) : document.body
 
     this.parent.appendChild(svg)
     return svg
+  }
+
+  positionSVG () {
+    const W = window.innerWidth
+    const H = window.innerHeight
+    const w = window.innerWidth / 2
+    const h = (w / 660) * 656
+    this.svgBox.style.left = W / 2 - w / 2 + 'px'
+    this.svgBox.style.top = H / 2 - h / 2 + 'px'
   }
 
   curveText (points, i, string) {
@@ -238,7 +250,8 @@ Line Number: ${linenumber}`)
     bg.style.left = '0'
     bg.style.top = '0'
     bg.style.zIndex = '-1'
-    bg.style.transition = 'filter 5s cubic-bezier(0.165, 0.84, 0.44, 1)'
+    bg.style.transition = 'filter 5s cubic-bezier(0.165, 0.84, 0.44, 1),' +
+      'opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1)'
     bg.style.filter = 'blur(100px)'
     document.body.appendChild(bg)
     this.drawCanvasBG(bg)
@@ -291,45 +304,133 @@ Line Number: ${linenumber}`)
   // --------------------------------------------------------------------------
   // SESSION + KEY LOGGING
 
+  setupReplay () {
+    this.cursor = document.createElement('img')
+    this.cursor.src = '../images/cursor.png'
+    this.cursor.style.position = 'fixed'
+    this.cursor.style.zIndex = '500'
+
+    this.convoEle.querySelector('.text').innerHTML = ''
+    this.convoEle.querySelector('.options').innerHTML = ''
+    this.canvasEle.style.opacity = 0
+    this.svgBox.style.opacity = 0
+    setTimeout(() => {
+      document.body.appendChild(this.cursor)
+      this.runReplays(0)
+      this.convoEle.style.opacity = 1
+      document.body.style.cursor = 'none'
+      const input = document.createElement('input')
+      input.style.cursor = 'none'
+      // TODO...
+      input.setAttribute('placeholder', 'your name')
+      input.setAttribute('disabled', 'true')
+      this.convoEle.querySelector('.options').appendChild(input)
+      this.positionConvo('center')
+    }, 2000)
+  }
+
+  runReplays (idx) {
+    const l = this.logs.length
+    const replayTime = this.logs[l - 1].time - this.logs[0].time
+    if (idx < l) { // update frame
+      const obj = this.logs[idx]
+      const input = document.querySelector('input')
+      if (obj.text) {
+        if (input) input.value = obj.text
+      } else if (obj.click) {
+        if (obj.click < this.opts.length) {
+          input.setAttribute('placeholder', this.opts[obj.click].text)
+          input.value = ''
+          this.positionConvo(this.opts[obj.click].pos)
+        } else this.positionConvo('center')
+      } else {
+        this.cursor.style.left = obj.x + 'px'
+        this.cursor.style.top = obj.y + 'px'
+      }
+      if (idx + 1 < l) {
+        const delay = this.logs[idx + 1].time - obj.time
+        setTimeout(() => this.runReplays(idx + 1), delay)
+      } else { // go bax to normal
+        setTimeout(() => {
+          document.body.style.cursor = "url('../images/cursor.png'), auto"
+          document.body.removeChild(this.cursor)
+          this.canvasEle.style.opacity = 0
+          setTimeout(() => {
+            this.convoEle.querySelector('.options').innerHTML = ''
+            this.createOption('I see...', () => this.goTo('do-nothing'))
+            this.canvasEle.style.opacity = 1
+          }, 500)
+        }, 1000)
+      }
+      if (idx + 1 === l) console.log(replayTime)
+    }
+  }
+
   setupLogger () {
     this.logging = true
+    this.opts = [
+      { text: 'your name', pos: 'center' },
+      { text: 'and your mom\'s maiden name?', pos: { x: 50, y: 50 } },
+      {
+        text: 'and your first pet\'s name?',
+        pos: {
+          x: window.innerWidth - (window.innerWidth / 2),
+          y: window.innerHeight - (window.innerHeight / 2)
+        }
+      },
+      {
+        text: 'and the name of the street you grew up on?',
+        pos: { x: 50, y: window.innerHeight - (window.innerHeight / 2) }
+      }
+    ]
     this.convoEle.querySelector('.text').innerHTML = ''
     this.convoEle.querySelector('.options').innerHTML = ''
     window.addEventListener('mousemove', (e) => this.logMouseMove(e))
     setTimeout(() => {
       this.convoEle.querySelector('.text')
         .innerHTML = 'Speaking of names, what do you prefer to be called?'
-      const input = document.createElement('input')
-      input.setAttribute('placeholder', 'your name')
-      input.addEventListener('input', (e) => this.logKeyStrokes(e))
-      const button = document.createElement('button')
-      button.textContent = 'submit'
-      button.addEventListener('click', () => {
-        this.logging = false
-        this.username = input.value === '' ? this.idb : input.value
-        this.convo = this.convoData()
-        if (this.username === this.idb) this.goTo('no-name')
-        else this.goTo('submit-name')
-      })
-      this.convoEle.querySelector('.options').appendChild(input)
-      this.convoEle.querySelector('.options').appendChild(button)
-      this.positionConvo('center')
+      this.nextLoggerOption(0)
       setTimeout(() => { this.convoEle.style.opacity = 1 }, 550)
     }, 100)
   }
 
+  nextLoggerOption (idx) {
+    const opt = this.opts[idx]
+    this.convoEle.querySelector('.options').innerHTML = ''
+    const input = document.createElement('input')
+    input.setAttribute('placeholder', opt.text)
+    input.addEventListener('input', (e) => this.logKeyStrokes(e))
+    const button = document.createElement('button')
+    button.textContent = 'submit'
+    button.addEventListener('click', () => {
+      this.logs.push({ time: Date.now(), click: idx + 1 })
+      if (idx === 0) { // first one
+        this.username = input.value === '' ? this.idb : input.value
+        this.convoEle.querySelector('.text').innerHTML = ''
+        this.nextLoggerOption(1)
+      } else if (idx === this.opts.length - 1) { // last one
+        setTimeout(() => { this.logging = false }, 1000)
+        this.convo = this.convoData()
+        if (this.username === this.idb) this.goTo('no-name', 'center')
+        else this.goTo('submit-name', 'center')
+      } else { // the rest of 'em
+        this.convoEle.querySelector('.text').innerHTML = ''
+        this.nextLoggerOption(idx + 1)
+      }
+    })
+    this.convoEle.querySelector('.options').appendChild(input)
+    this.convoEle.querySelector('.options').appendChild(button)
+    this.positionConvo(opt.pos)
+  }
+
   logKeyStrokes (e) {
     if (!this.logging) return
-    this.logs.keystrokes.push({
-      time: Date.now(), keys: e.target.value
-    })
+    this.logs.push({ time: Date.now(), text: e.target.value })
   }
 
   logMouseMove (e) {
     if (!this.logging) return
-    this.logs.mousemoves.push({
-      time: Date.now(), x: e.clientX, y: e.clientY
-    })
+    this.logs.push({ time: Date.now(), x: e.clientX, y: e.clientY })
   }
 
   // --------------------------------------------------------------------------
@@ -346,8 +447,7 @@ Line Number: ${linenumber}`)
 
   positionConvo (layout) {
     if (layout) this.convoLayout = layout
-    const type = this.convoLayout
-    if (type === 'center') {
+    if (this.convoLayout === 'center') {
       const h = this.convoEle.offsetHeight
       const w = this.convoEle.offsetWidth
       const height = window.innerHeight
@@ -355,6 +455,10 @@ Line Number: ${linenumber}`)
       this.convoEle.style.maxWidth = '40vw'
       this.convoEle.style.left = `${width / 2 - w / 2}px`
       this.convoEle.style.top = `${height / 2 - h / 2}px`
+    } else if (typeof this.convoLayout === 'object') {
+      this.convoEle.style.maxWidth = '40vw'
+      this.convoEle.style.left = `${this.convoLayout.x}px`
+      this.convoEle.style.top = `${this.convoLayout.y}px`
     } else {
       this.convoEle.style.maxWidth = '30vw'
       this.convoEle.style.left = '10px'
@@ -364,7 +468,7 @@ Line Number: ${linenumber}`)
 
   createOption (txt, func) {
     const div = document.createElement('div')
-    div.textContent = txt
+    div.innerHTML = txt
     div.onclick = func
     this.convoEle.querySelector('.options').appendChild(div)
   }
@@ -374,6 +478,9 @@ Line Number: ${linenumber}`)
 
     if (id === 'pref-name') {
       setTimeout(() => { this.setupLogger() }, 550)
+      return
+    } else if (id === 'pref-name-replay') {
+      setTimeout(() => { this.setupReplay() }, 550)
       return
     }
 
@@ -418,8 +525,8 @@ Line Number: ${linenumber}`)
       'your-id': {
         content: 'Well, it\'s less of a name and more of an id. Colloquially it\'s referred to as your browser/device "fingerprint". I\'ve abbreviated it, it\'s typically a bit longer. It\'s how they watch you online.',
         options: {
-          'what\'s it like unabbreviated?': () => { this.goTo('your-full-id') },
-          'I see...': () => { this.goTo('pref-name') }
+          'I see...': () => { this.goTo('pref-name') },
+          'what\'s it like unabbreviated?': () => { this.goTo('your-full-id') }
         }
       },
       'your-full-id': {
@@ -500,13 +607,20 @@ Line Number: ${linenumber}`)
         content: 'Regardless of whether or not you use cookie blockers, privacy/incognito windows or even proxy servers like VPNs or TOR, they can still identify you by this fingerprint as I just did.',
         options: {
           'how?': () => {
-            this.canvasEle.style.filter = 'blur(0px)'
-            this.goTo('it-begins-with-abstraction', 'top-left')
+            this.convoEle.style.opacity = 0
+            setTimeout(() => {
+              this.canvasEle.style.filter = 'blur(0px)'
+              this.convoEle.querySelector('.text').innerHTML = ''
+              this.convoEle.querySelector('.options').innerHTML = ''
+              setTimeout(() => {
+                this.goTo('it-begins-with-abstraction', 'top-left')
+              }, 4000)
+            }, 500)
           }
         }
       },
       'it-begins-with-abstraction': {
-        content: 'It begins with an abstract composition, a set of geometric shapes layered over each other and composited in a particular way. This is not done for aesthetic purposes, these compositions have been found all across the Web, but they are never displayed. Instead these are used to identify tiny differences in the way your particular device renders images.',
+        content: 'It begins with an abstract composition, a set of geometric shapes layered over each other and composited in a particular way. This is not done for aesthetic purposes, though these compositions have been found all across the Web, they are never visually displayed. Instead they discreetly identify tiny variations in the way your particular device renders images.',
         options: {
           'go on...': () => { this.goTo('canvas-fingerprinting') }
         }
@@ -536,23 +650,27 @@ Line Number: ${linenumber}`)
         }
       },
       'your-browser-print': {
-        content: `Web browsers, like the ${typeof Averigua.browserInfo().name === 'string' ? Averigua.browserInfo().name : ''} browser you are using now, share a lot about you as well. This data is meant to be used ethically, for utilitarian purposes, but there are very few rules demanding that this be the case. And so, online trackers secretively aggregate various bits of data to form a unique fingerprint used that identifies you.`,
+        content: `Web browsers, like the ${typeof Averigua.browserInfo().name === 'string' ? Averigua.browserInfo().name : ''} browser you are using now, share a lot about you as well. This data is meant to be used ethically, for utilitarian purposes, but there are very few rules demanding that this be the case. And so, online trackers secretively aggregate various bits of data to form a unique fingerprint used used to identify you.`,
         options: {
           'how?': () => {
-            this.setupSVGLines()
+            this.svgBox.style.opacity = 1
             this.goTo('the-specifics-vary')
           }
         }
       },
       'the-specifics-vary': {
-        content: 'The specifics vary from tracker to tracker, but it often begins with an abstract composition like the one I\'ve rendered in the background. This gets compressed into a short string of text and added as the first data point in your fingerprint.',
+        content: 'The specifics vary from tracker to tracker, but it often begins with an abstract composition like the one I\'ve rendered in the background. This gets compressed into a short string of text which becomes a unique data point',
         options: {
-          'the first? there\'s more?': () => { this.goTo('plenty-more') },
+          'the first? there\'s more?': () => {
+            this.canvasEle.style.filter = 'blur(100px)'
+            this.str = this.updateStr(2)
+            this.goTo('plenty-more')
+          },
           'short string of text?': () => { this.goTo('canvas-hash') }
         }
       },
       'canvas-hash': {
-        content: `Yes, for example, you're particular canvas fingerprint is ${this.canv}`,
+        content: `Yes, your canvas fingerprint is ${this.canv}`,
         options: {
           'you said this was only the first data point?': () => {
             this.canvasEle.style.filter = 'blur(100px)'
@@ -636,9 +754,9 @@ Line Number: ${linenumber}`)
         }
       },
       'my-fonts': {
-        content: `No, unlike cookies, trackers never ask you for permission to do this. As it turns out, you have ${Averigua.fontSupport().length} fonts installed that match my internal list of 485 fonts. I can now add these fonts to your fingerprint as well.`,
+        content: `No, unlike cookies, trackers never ask you for permission to do this. As it turns out, you have ${Averigua.fontSupport().length} fonts installed that match my internal list of 485 fonts. I've now added these fonts to your fingerprint as well.`,
         options: {
-          'go on...': () => { this.goTo('print-complete') }
+          'I see': () => { this.goTo('print-complete') }
         }
       },
       'print-complete': {
@@ -659,7 +777,7 @@ Line Number: ${linenumber}`)
       'diff-task': {
         content: 'This sort of fingerprinting takes a lot of effort and creativity. Using data in unconventional ways isn\'t inherently unethical. Just imagine what these clever programmers could have created instead had their skills been assigned to a different task?',
         options: {
-          'I can only imagine...': () => { this.goTo('today-we-block') }
+          'I can <i>only</i> imagine...': () => { this.goTo('today-we-block') }
         }
       },
       'today-we-block': {
@@ -671,100 +789,107 @@ Line Number: ${linenumber}`)
       'cat-and-mouse': {
         content: 'It is, and speaking of your mouse, techniques like <a href="https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector#session-recording" target="_blank">session recording</a> and <a href="key-logging" target="_blank">key logging</a> have now also become part of the online tracking toolkit.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'what is that?': () => { this.goTo('what-is-logging') },
+          'isn\'t that what hackers do?': () => { this.goTo('hackers-do') },
+          'isn\'t that used for UX testing?': () => { this.goTo('user-testing') }
         }
       },
-      'test': {
-        content: '',
+      'hackers-do': {
+        content: 'Yes, and now it\'s at part of the online tracking répertoire. One tracker was even caught <a href="https://freedom-to-tinker.com/2018/02/26/no-boundaries-for-credentials-password-leaks-to-mixpanel-and-session-replay-companies/" target="_blank">storing passwords that users typed into websites</a>.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'how do they get away with this?': () => { this.goTo('what-is-logging') }
         }
       },
-      'test': {
-        content: '',
+      'user-testing': {
+        content: 'It is, but this is different.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'how?': () => { this.goTo('how-is-it-diff') }
         }
       },
-      'test': {
-        content: '',
+      'how-is-it-diff': {
+        content: 'If a netizen is participating in transparent (ideally paid) "user testing" they have agency. People behave differently when they know they\'re being watched. When these tactics are deployed on netizens without their consent bad things happen.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'I see': () => { this.goTo('what-is-logging') },
+          'like what?': () => { this.goTo('like-what') }
         }
       },
-      'test': {
-        content: '',
+      'like-what': {
+        content: 'Well if you think no ones watching you feel safe typing in your password. Some online trackers have been caught <a href="https://freedom-to-tinker.com/2018/02/26/no-boundaries-for-credentials-password-leaks-to-mixpanel-and-session-replay-companies/" target="_blank">storing passwords that users typed into websites</a> without their realization.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'point made': () => { this.goTo('what-is-logging') },
+          'that\'s their own fault': () => { this.goTo('what-is-logging') }
         }
       },
-      'test': {
-        content: '',
+      'what-is-logging': {
+        content: 'Do you remember earlier when I asked about what your preferred name was?',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'yea...': () => {
+            if (this.username === this.idb) this.goTo('do-u-remember-a')
+            else this.goTo('do-u-remember-b')
+          }
         }
       },
-      'test': {
-        content: '',
+      'do-u-remember-a': {
+        content: 'Well, even though you chose not to share your name I was still watching to see what you would type and how you were moving your mouse...',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'what?': () => { this.goTo('pref-name-replay') }
         }
       },
-      'test': {
-        content: '',
+      'do-u-remember-b': {
+        content: 'Well, I was secretly recording all your keystrokes and mouse movements...',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'what?': () => { this.goTo('pref-name-replay') }
         }
       },
-      'test': {
-        content: '',
+      'do-nothing': {
+        content: 'Just like your battery status, using machine learning algorithms, these mouse and keystroke data can also be used to make predictions about you.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'like what?': () => { this.goTo('like-onset-condition') }
         }
       },
-      'test': {
-        content: '',
+      'like-onset-condition': {
+        content: 'Like whether or not you have an onset neurological disease. Search engines have been <a href="https://www.wsj.com/articles/clues-to-parkinsons-disease-from-how-you-use-your-computer-1527600547" target="_blank">able to detect</a> subtle signs of medical conditions potentially before your doctor does. And if <a href="https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0188226" target="_blank">someone else knows</a> you have Parkinson\'s disease before you do... what do you think they\'ll do with that information?',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'tell me, so I can get it checked out?': () => { this.goTo('tell-me') },
+          'sell it to the highest bidder?': () => { this.goTo('sell-it') }
         }
       },
-      'test': {
-        content: '',
+      'tell-me': {
+        content: 'That would be the ethical thing to do, but surveillance capitalism has never really been motivated by ethics.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'right...': () => { this.goTo('you-are-the-product') }
         }
       },
-      'test': {
-        content: '',
+      'sell-it': {
+        content: 'Unfortunately, that\'s a reasonable assumption.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'right...': () => { this.goTo('you-are-the-product') }
         }
       },
-      'test': {
-        content: '',
+      'you-are-the-product': {
+        content: 'Remember, if the product is free, you\'re not the customer. But I can image certain customers, perhaps an insurance company or a large employer, might find this sort of information very valuable.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'right...': () => { this.goTo('closing-statement') }
         }
       },
-      'test': {
-        content: '',
+      'closing-statement': {
+        content: 'These sort of data fueled predictions can be used to help you, but it can just as easily be used to hurt you. While our online experiences remain the free raw material for hidden commercial practices of extraction, prediction and sales, the latter is certainly more likely.',
         options: {
-          'go on...': () => { this.goTo('test') }
+          'so what can I do about it?': () => { this.fin() }
         }
       },
-      'test': {
-        content: '',
+      'what-to-do': {
+        content: 'Do you work at a tech company?',
         options: {
-          'go on...': () => { this.goTo('test') }
-        }
-      },
-      'test': {
-        content: '',
-        options: {
-          'go on...': () => { this.goTo('test') }
+          yes: () => { this.fin(true) },
+          no: () => { this.fin(false) }
         }
       }
     }
+  }
+
+  fin (techEmployee) {
+    console.log('TODO: FIN')
   }
 }
 
