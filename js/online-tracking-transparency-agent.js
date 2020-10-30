@@ -37,7 +37,9 @@ class OTTA {
           this.id = id
           this.idb = `${id.substring(0, 3)}...${id.substring(id.length - 3)}`
           this.convo = this.convoData()
-          this.goTo('greet-visitor')
+          if (window.location.hash === '#see') this.demo()
+          else if (Averigua.isMobile()) this.mobile()
+          else this.goTo('greet-visitor')
         })
       })
     } else {
@@ -54,8 +56,10 @@ Line Number: ${linenumber}`)
     }
 
     window.addEventListener('resize', (e) => {
-      this.positionConvo()
-      this.positionSVG()
+      if (opts.conversation) {
+        this.positionConvo()
+        this.positionSVG()
+      }
       this.canvasEle.width = window.innerWidth
       this.canvasEle.height = window.innerHeight
       this.drawCanvasBG(this.canvasEle)
@@ -216,20 +220,20 @@ Line Number: ${linenumber}`)
     const r1 = (w > h) ? h / 8 : w / 8
     const r2 = (w > h) ? h : w
     ctx.globalAlpha = 0.25
-    ctx.fillStyle = newGrd(['white', 'violet', 'blue'], x, y, r1, r2)
+    ctx.fillStyle = newGrd(['#aaa', 'violet', 'blue'], x, y, r1, r2)
     ctx.fillRect(0, 0, w, h)
 
     x = w * 0.25
     y = h * 0.25
     ctx.globalCompositeOperation = 'lighter'
-    ctx.fillStyle = newGrd(['red', 'white'], x, y, r1, r2)
+    ctx.fillStyle = newGrd(['red', '#aaa'], x, y, r1, r2)
     ctx.fillRect(w * 0.25, h * 0.1, w * 0.25, h * 0.40)
 
     ctx.beginPath()
     ctx.arc(w / 2, h / 2, w * 0.1, 0, 2 * Math.PI)
     ctx.closePath()
     ctx.globalAlpha = 1
-    ctx.fillStyle = newGrd(['violet', 'blue', 'white'], x, y, r1, r2)
+    ctx.fillStyle = newGrd(['violet', 'blue', '#aaa'], x, y, r1, r2)
     ctx.fill()
 
     ctx.beginPath()
@@ -252,7 +256,8 @@ Line Number: ${linenumber}`)
     bg.style.zIndex = '-1'
     bg.style.transition = 'filter 5s cubic-bezier(0.165, 0.84, 0.44, 1),' +
       'opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1)'
-    bg.style.filter = 'blur(100px)'
+    if (window.location.hash === '#see') bg.style.filter = 'blur(0px)'
+    else bg.style.filter = 'blur(100px)'
     document.body.appendChild(bg)
     this.drawCanvasBG(bg)
     const fp = document.createElement('canvas')
@@ -439,9 +444,14 @@ Line Number: ${linenumber}`)
   setupConvo (ele) {
     this.convoLayout = 'center'
     this.convoEle = (ele && typeof ele === 'string')
-      ? document.querySelector(ele) : document.body
+      ? document.querySelector(ele) : document.createElement('div')
+    if (!ele) {
+      this.convoEle.innerHTML = `
+      <div class="text"></div>
+      <div class="options"></div>
+      `
+    }
     this.convoEle.style.opacity = 1
-    this.convoEle.querySelector('.text').textContent = '...loading...'
     this.positionConvo('center')
   }
 
@@ -556,11 +566,11 @@ Line Number: ${linenumber}`)
       'all-becomes-data': {
         content: 'Everything we do on the Internet generates data, this data is your experience of the online world made manifest. This experience has become free raw material for hidden commercial practices of extraction, prediction and sales. A new economic order, which has come to dominate the information age, known as <a href="https://en.wikipedia.org/wiki/Surveillance_capitalism" target="_blank">Surveillance Capitalism</a>.',
         options: {
-          'Surveillance Capitalism?': () => { this.goTo('tracking-you') }
+          'I see...': () => { this.goTo('tracking-you') }
         }
       },
       'tracking-you': {
-        content: `Yes, and this new economic order depends on being able to identify you ${this.username}. Regardless of whether or not you chose to sign-up, log-in, or otherwise identify yourself. This sort of <a href="https://www.cs.princeton.edu/~arvindn/publications/OpenWPM_1_million_site_tracking_measurement.pdf" target="_blank">tracking</a> watches you across websites and services.`,
+        content: `This new economic order depends on being able to identify you ${this.username}. Regardless of whether or not you chose to sign-up, log-in, or otherwise identify yourself. This sort of <a href="https://www.cs.princeton.edu/~arvindn/publications/OpenWPM_1_million_site_tracking_measurement.pdf" target="_blank">tracking</a> watches you across websites and services.`,
         options: {
           'how so?': () => { this.goTo('third-party-cookies') },
           'I know, cookies right?': () => { this.goTo('cookies-right') }
@@ -620,7 +630,7 @@ Line Number: ${linenumber}`)
         }
       },
       'it-begins-with-abstraction': {
-        content: 'It begins with an abstract composition, a set of geometric shapes layered over each other and composited in a particular way. This is not done for aesthetic purposes, though these compositions have been found all across the Web, they are never visually displayed. Instead they discreetly identify tiny variations in the way your particular device renders images.',
+        content: 'It begins with an abstract composition, a set of geometric shapes layered over each other and composited in a particular way. This is not done for aesthetic purposes, though these compositions have been <a href="https://www.instagram.com/p/CFzdrdjHOsK/" target="_blank">found all across the Web</a>, they are never visually displayed. Instead they discreetly identify tiny variations in the way your particular device renders images.',
         options: {
           'go on...': () => { this.goTo('canvas-fingerprinting') }
         }
@@ -638,7 +648,7 @@ Line Number: ${linenumber}`)
         }
       },
       'seems-helpful': {
-        content: 'It is, but this seemingly innocuous bit of data can actually be abused. Today data is used to make predictions about your behavior. Predictions which are then used to manipulate your behavior in devious ways.',
+        content: 'It is, but this seemingly innocuous byte of data can actually be abused. Today data is used to make predictions about your behavior. Predictions which are then used to manipulate your behavior in devious ways.',
         options: {
           'how?': () => { this.goTo('uber-predictions') }
         }
@@ -650,7 +660,7 @@ Line Number: ${linenumber}`)
         }
       },
       'your-browser-print': {
-        content: `Web browsers, like the ${typeof Averigua.browserInfo().name === 'string' ? Averigua.browserInfo().name : ''} browser you are using now, share a lot about you as well. This data is meant to be used ethically, for utilitarian purposes, but there are very few rules demanding that this be the case. And so, online trackers secretively aggregate various bits of data to form a unique fingerprint used used to identify you.`,
+        content: `Web browsers, like the ${typeof Averigua.browserInfo().name === 'string' ? Averigua.browserInfo().name : ''} browser you are using now, share a lot about you as well. This data is meant to be used ethically, for utilitarian purposes, but there are very few rules demanding that this be the case. And so, online trackers aggregate various bits of data to form a unique fingerprint used used to secretly identify you.`,
         options: {
           'how?': () => {
             this.svgBox.style.opacity = 1
@@ -836,7 +846,7 @@ Line Number: ${linenumber}`)
         }
       },
       'do-u-remember-b': {
-        content: 'Well, I was secretly recording all your keystrokes and mouse movements...',
+        content: `Well ${this.username}, I was secretly recording all your keystrokes and mouse movements...`,
         options: {
           'what?': () => { this.goTo('pref-name-replay') }
         }
@@ -861,9 +871,9 @@ Line Number: ${linenumber}`)
         }
       },
       'sell-it': {
-        content: 'Unfortunately, that\'s a reasonable assumption.',
+        content: 'Unfortunately, that\'s a reasonable assumption. As you know, if the product is free, you\'re not the customer. But I can image certain customers who might find this sort of information very valuable, perhaps an insurance company or a large employer.',
         options: {
-          'right...': () => { this.goTo('you-are-the-product') }
+          'right...': () => { this.goTo('closing-statement') }
         }
       },
       'you-are-the-product': {
@@ -888,8 +898,67 @@ Line Number: ${linenumber}`)
     }
   }
 
+  mobile () {
+    window.alert("Sorry, this doesn't work on mobile :(")
+  }
+
+  _demoEle (content, spot) {
+    const ele = document.createElement('div')
+    ele.innerHTML = content
+    ele.style.position = 'fixed'
+    ele.style.zIndex = '1000'
+    ele.style.left = '0'
+    if (spot === 'top') {
+      ele.style.top = '40px'
+      ele.style.fontSize = '64px'
+    } else {
+      ele.style.bottom = '40px'
+      ele.style.fontSize = '24px'
+    }
+    ele.style.textAlign = 'center'
+    ele.style.opacity = 0
+    ele.style.color = '#fff'
+    ele.style.width = '100vw'
+    ele.style.transition = 'opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1)'
+    document.body.appendChild(ele)
+    return ele
+  }
+
+  demo () {
+    const title = this._demoEle('<a href="/you">howthey.watch/you</a>', 'top')
+    const print = this._demoEle(this.id, 'bottom')
+
+    setTimeout(() => {
+      this.canvasEle.style.filter = 'blur(100px)'
+      this.data = this.data.join(',').split(',')
+      const delay = 100
+      setTimeout(() => {
+        this.svgBox.style.opacity = '1'
+        for (let i = 0; i < this.data.length; i++) {
+          setTimeout(() => { this.str = this.updateStr(i) }, (i * delay))
+        }
+      }, 2000)
+      setTimeout(() => {
+        title.style.opacity = 1
+        print.style.opacity = 1
+      }, this.data.length * delay + 2000)
+    }, 2000)
+
+    window.addEventListener('keydown', (e) => {
+      if (e.keyCode === 82) { // r
+        title.style.opacity = 0
+        print.style.opacity = 0
+        this.svgBox.style.opacity = 0
+        setTimeout(() => {
+          this.canvasEle.style.filter = 'blur(0px)'
+        }, 2000)
+      }
+    })
+  }
+
   fin (techEmployee) {
-    console.log('TODO: FIN')
+    const http = window.location.protocol
+    window.location = `${http}//${window.location.host}/us`
   }
 }
 
