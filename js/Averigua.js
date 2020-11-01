@@ -103,7 +103,8 @@ class Averigua {
 
   static doNotTrack () {
     if (!this.isBrowser()) return this._browserErr()
-    if (navigator.doNotTrack === '1' || navigator.doNotTrack === 'yes') {
+    const t = navigator.doNotTrack
+    if (t === '1' || t === 'yes' || t === 1 || t === true) {
       return true
     } else return false
   }

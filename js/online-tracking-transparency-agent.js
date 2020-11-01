@@ -384,7 +384,7 @@ Line Number: ${linenumber}`)
         }
       },
       {
-        text: 'and the name of the street you grew up on?',
+        text: 'and the street you grew up on?',
         pos: { x: 50, y: window.innerHeight - (window.innerHeight / 2) }
       }
     ]
@@ -660,7 +660,7 @@ Line Number: ${linenumber}`)
         }
       },
       'your-browser-print': {
-        content: `Web browsers, like the ${typeof Averigua.browserInfo().name === 'string' ? Averigua.browserInfo().name : ''} browser you are using now, share a lot about you as well. This data is meant to be used ethically, for utilitarian purposes, but there are very few rules demanding that this be the case. And so, online trackers aggregate various bits of data to form a unique fingerprint used used to secretly identify you.`,
+        content: `Web browsers, like the ${typeof Averigua.browserInfo().name === 'string' ? Averigua.browserInfo().name : ''} browser you are using now, share a lot about you as well. This data is meant to be used ethically, for utilitarian purposes, but there are very few rules demanding that this be the case. And so, online trackers aggregate various bits of data to form a unique fingerprint used to secretly identify you.`,
         options: {
           'how?': () => {
             this.svgBox.style.opacity = 1
@@ -721,7 +721,7 @@ Line Number: ${linenumber}`)
         }
       },
       'even-more': {
-        content: `Loads more data can be pulled from your system, like the fact that you're ${Averigua.platformInfo().mobile ? '' : 'not'} on a mobile device and the fact that you have ${Averigua.platformInfo().processors} CPU cores running on the ${Averigua.platformInfo().platform} platform ${typeof Averigua.gpuInfo().vendor === 'string' ? 'with a GPU made by ' + Averigua.gpuInfo().vendor : ''}.`,
+        content: `Loads more data can be pulled from your system, like the fact that you're ${Averigua.platformInfo().mobile ? '' : 'not'} on a mobile device and the fact that you have ${Averigua.platformInfo().processors ? Averigua.platformInfo().processors + ' CPU cores running on the' : 'a'} ${Averigua.platformInfo().platform} platform ${typeof Averigua.gpuInfo().vendor === 'string' ? 'with a GPU made by ' + Averigua.gpuInfo().vendor : ''}.`,
         options: {
           'I see...': () => { this.goTo('already-enough') }
         }
