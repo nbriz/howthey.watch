@@ -45,3 +45,7 @@
 <p style="text-align: right">
   <a href="http://nickbriz.com" target="_blank" title="Nick Briz" style="text-decoration:none;">&lt;3 ../n!ck</a>
 </p>
+
+----
+
+Commissioned by <a href="http://culture.theodi.org/" target="_blank">ODI Data as Culture</a> and produced as part of an <a href="https://theodi.org/project/data-innovation-for-uk-research-and-development/" target="_blank">ODI R&D project</a> exploring sustainable ethical practice around data, funded by Innovate UK
