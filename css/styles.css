@@ -90,6 +90,10 @@ footer {
   margin: 100px auto;
 }
 
+li {
+  margin: 20px 0px;
+}
+
 /* hypermedia essay styles */
 
 svg {

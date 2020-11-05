@@ -797,7 +797,7 @@ Line Number: ${linenumber}`)
         }
       },
       'cat-and-mouse': {
-        content: 'It is, and speaking of your mouse, techniques like <a href="https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector#session-recording" target="_blank">session recording</a> and <a href="key-logging" target="_blank">key logging</a> have now also become part of the online tracking toolkit.',
+        content: 'It is, and speaking of your mouse, techniques like <a href="https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector#session-recording" target="_blank">session recording</a> and <a href="https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector#key-logging" target="_blank">key logging</a> have now also become part of the online tracking toolkit.',
         options: {
           'what is that?': () => { this.goTo('what-is-logging') },
           'isn\'t that what hackers do?': () => { this.goTo('hackers-do') },
