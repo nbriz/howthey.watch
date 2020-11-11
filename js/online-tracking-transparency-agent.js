@@ -712,7 +712,7 @@ Line Number: ${linenumber}`)
         }
       },
       'ironic-tracking-bit': {
-        content: 'Although, regardless of whether or not you have "do-not-track" enabled, this bit of data is itself a piece of information trackers have been known to include in your fingerprint. Ironic isn\'t it? You\'re explicit declaration of the desire for privacy is itself used to track you.',
+        content: 'Although, regardless of whether or not you have "do-not-track" enabled, this bit of data is itself a piece of information trackers have been known to include in your fingerprint. Ironic isn\'t it? Your explicit declaration of the desire for privacy is itself used to track you.',
         options: {
           'ironic indeed': () => {
             this.str = this.updateStr(7)
@@ -925,7 +925,7 @@ Line Number: ${linenumber}`)
   }
 
   demo () {
-    const title = this._demoEle('<a href="/you">howthey.watch/you</a>', 'top')
+    const title = this._demoEle('<a href="index.html">howthey.watch/you</a>', 'top')
     const print = this._demoEle(this.id, 'bottom')
 
     setTimeout(() => {
