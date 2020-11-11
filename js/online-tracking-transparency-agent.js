@@ -899,7 +899,16 @@ Line Number: ${linenumber}`)
   }
 
   mobile () {
-    window.alert("Sorry, this doesn't work on mobile :(")
+    const w = window
+    // window.alert("Sorry, this doesn't work on mobile :(")
+    w.confirm('Sorry, but this piece is meant to be viewed on a desktop or laptop computer and not on a mobile devices.')
+    const a1 = w.confirm('Want to know how I knew you were on a mobile device?')
+    if (!a1) w.location = '../index.html'
+    else {
+      w.confirm(`I'd love to tell you all about it, but like I said the ${Averigua.browserInfo().name} browser on your mobile ${Averigua.platformInfo().platform} device isn't gonna work for me.`)
+      w.confirm("There's a point I'm trying to make, and that point is best made on a computer with a mouse or trackpad. Visit https://howthey.track/you")
+      w.location = '../index.html'
+    }
   }
 
   _demoEle (content, spot) {
