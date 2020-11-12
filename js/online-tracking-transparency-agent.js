@@ -900,6 +900,7 @@ Line Number: ${linenumber}`)
 
   mobile () {
     const w = window
+    if (!w.location.location.toString().includes('they.watch/you')) return
     const http = w.location.protocol
     // window.alert("Sorry, this doesn't work on mobile :(")
     w.confirm('Sorry, but this piece is meant to be viewed on a desktop or laptop computer and not on a mobile devices.')
