@@ -908,7 +908,7 @@ Line Number: ${linenumber}`)
     if (!a1) w.location = `${http}//${window.location.host}`
     else {
       w.confirm(`I'd love to tell you all about it, but like I said the ${Averigua.browserInfo().name} browser on your mobile ${Averigua.platformInfo().platform} device isn't gonna work for me.`)
-      w.confirm("There's a point I'm trying to make, and that point is best made on a computer with a mouse or trackpad. Visit https://howthey.track/you")
+      w.confirm("There's a point I'm trying to make, and that point is best made on a computer with a mouse or trackpad. Visit https://howthey.watch/you")
       w.location = `${http}//${window.location.host}`
     }
   }
