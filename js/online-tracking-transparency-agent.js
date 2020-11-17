@@ -871,7 +871,7 @@ Line Number: ${linenumber}`)
         }
       },
       'sell-it': {
-        content: 'Unfortunately, that\'s a reasonable assumption. As you know, if the product is free, you\'re not the customer. But I can image certain customers who might find this sort of information very valuable, perhaps an insurance company or a large employer.',
+        content: 'Unfortunately, that\'s a reasonable assumption. As you know, if the product is free, you\'re not the customer. But I can imagine certain customers who might find this sort of information very valuable, perhaps an insurance company or a large employer.',
         options: {
           'right...': () => { this.goTo('closing-statement') }
         }
