@@ -939,6 +939,14 @@ Line Number: ${linenumber}`)
     const title = this._demoEle('<a href="index.html">howthey.watch/you</a>', 'top')
     const print = this._demoEle(this.id, 'bottom')
 
+    if (window.innerWidth < window.innerHeight) {
+      const svg = document.querySelector('#fingerPrint')
+      svg.style.width = '75vw'
+      svg.style.left = '12.5vw'
+      title.style.fontSize = '11vw'
+      print.style.fontSize = '3vw'
+    }
+
     setTimeout(() => {
       this.canvasEle.style.filter = 'blur(100px)'
       this.data = this.data.join(',').split(',')
