@@ -37,7 +37,7 @@ class OTTA {
           this.id = id
           this.idb = `${id.substring(0, 3)}...${id.substring(id.length - 3)}`
           this.convo = this.convoData()
-          if (window.location.hash === '#see') this.demo()
+          if (window.location.hash.includes('#see')) this.demo()
           else if (Averigua.isMobile()) this.mobile()
           else this.goTo('greet-visitor')
         })
@@ -945,6 +945,10 @@ Line Number: ${linenumber}`)
       svg.style.left = '12.5vw'
       title.style.fontSize = '11vw'
       print.style.fontSize = '3vw'
+    }
+
+    if (window.location.hash === '#see2') {
+      title.style.display = 'none'
     }
 
     setTimeout(() => {
