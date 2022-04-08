@@ -936,7 +936,7 @@ Line Number: ${linenumber}`)
   }
 
   demo () {
-    const title = this._demoEle('<a href="index.html">howthey.watch/you</a>', 'top')
+    const title = this._demoEle('<a href="../index.html">howthey.watch/you</a>', 'top')
     const print = this._demoEle(this.id, 'bottom')
 
     if (window.innerWidth < window.innerHeight) {
