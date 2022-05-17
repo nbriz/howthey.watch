@@ -256,7 +256,7 @@ Line Number: ${linenumber}`)
     bg.style.zIndex = '-1'
     bg.style.transition = 'filter 5s cubic-bezier(0.165, 0.84, 0.44, 1),' +
       'opacity 2s cubic-bezier(0.165, 0.84, 0.44, 1)'
-    if (window.location.hash === '#see') bg.style.filter = 'blur(0px)'
+    if (window.location.hash.includes('#see')) bg.style.filter = 'blur(0px)'
     else bg.style.filter = 'blur(100px)'
     document.body.appendChild(bg)
     this.drawCanvasBG(bg)
@@ -937,7 +937,7 @@ Line Number: ${linenumber}`)
 
   demo () {
     const title = this._demoEle('<a href="../index.html">howthey.watch/you</a>', 'top')
-    const print = this._demoEle(this.id, 'bottom')
+    const print = this._demoEle(`<a href="../index.html">${this.id}</a>`, 'bottom')
 
     if (window.innerWidth < window.innerHeight) {
       const svg = document.querySelector('#fingerPrint')
@@ -947,7 +947,7 @@ Line Number: ${linenumber}`)
       print.style.fontSize = '3vw'
     }
 
-    if (window.location.hash === '#see2') {
+    if (window.location.hash === '#see') {
       title.style.display = 'none'
     }
 
