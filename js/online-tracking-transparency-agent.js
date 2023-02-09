@@ -877,7 +877,7 @@ Line Number: ${linenumber}`)
         }
       },
       'you-are-the-product': {
-        content: 'Remember, if the product is free, you\'re not the customer. But I can image certain customers, perhaps an insurance company or a large employer, might find this sort of information very valuable.',
+        content: 'Remember, if the product is free, you\'re not the customer. But I can imagine certain customers, perhaps an insurance company or a large employer, might find this sort of information very valuable.',
         options: {
           'right...': () => { this.goTo('closing-statement') }
         }
